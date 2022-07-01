@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vue Villainious Battles</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦹‍♂️</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/vue@next" defer></script>
+  <script src="app.js" defer></script>
+  <script src="randomValue.js"></script>
+  <script src="villains.js"></script>
+
+</head>
+
+<body>
+  <!-- BG -->
+  <div id="vanta-canvas"></div>
+  <!-- Game -->
+  <div id="game">
+    <header :class="{'starting-screen-header': gameStatus === 'Not Started'}">
+      <h1>Vue Villainious Battles</h1>
+      <button @click="goHome" v-show="gameStatus !== 'Not Started'" id="home-button">BACK TO START SCREEN</button>
+    </header>
+    <div id="starting-screen" v-if="gameStatus === 'Not Started'">
+      <h2 id="starting-screen-villain">🦹‍♂️</h2>
+      <div id="starting-screen-interaction">
+        <!-- User Name Input -->
+        <div id="name-input">
+          <input v-model="playerName" @keydown.enter="playerName.length > 2 ? startGame() : null" type="text"
+            placeholder="Your character name..." maxlength="20">
+          <span class="name-input-char-count">
+            {{ playerName.length < 3 && playerName.length> 0 ? 3 - playerName.length + ' characters more' : ''}}
+          </span>
+          <span class="name-input-char-count" v-if="playerName.length > 3">
+            {{ 20 - playerName.length }}
+          </span>
+        </div>
+        <!-- Start Game Button -->
+        <button :disabled="playerName.length < 3" @click="startGame('initial')">
+          START BATTLE
+        </button>
+      </div>
+    </div>
+    <div v-else>
+      <!-- The Win / Loss Screen -->
+      <div id="end-screen" v-if="gameStatus !== 'Active'">
+        <h1 style="color: white"> {{ gameStatus }}! </h1>
+        <div id="end-screen-buttons">
+          <button class="end-screen-button" @click="startGame('newVillain')">
+            RESTART WITH NEW VILLAIN
+          </button>
+          <button class="end-screen-button" @click="startGame('restart')">
+            RESTART
+          </button>
+        </div>
+      </div>
+      <!-- The Section Where the Player and Villain is Displayed -->
+      <section id="battle-ground">
+        <div id="villain" class="container">
+          <h2>🦹‍♂️ {{ villainName }}</h2>
+          <p>💜 {{ villainHealth }}</p>
+          <div class="healthbar">
+            <div class="healthbar-value"
+              :style="{ width: villainHealth + '%', 'border-radius': villainHealth < 100 ? '12px 0 0 12px' : 'inherit' }">
+            </div>
+          </div>
+        </div>
+        <div id="player" class="container">
+          <h2>{{ playerName }} 🦸</h2>
+          <p>{{ playerHealth }} ❤️</p>
+          <div class="healthbar">
+            <div class="healthbar-value"
+              :style="{ width: playerHealth + '%', 'border-radius': playerHealth < 100 ? '12px 0 0 12px' : 'inherit' }">
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Player Controls -->
+      <section id="controls">
+        <button @click="attackVillain">ATTACK</button>
+        <button :disabled="specialCooldown !== 0" @click="specialAttack">
+          SPECIAL ATTACK
+          <span v-if="specialCooldown !== 0">
+            (Ready in {{ specialCooldown }} {{specialCooldown === 1 ? 'round' : 'rounds' }})
+          </span>
+        </button>
+        <button :disabled="healsCounter < 1" @click="healPlayer">HEAL (Uses left: {{ healsCounter }})</button>
+        <button @click="this.gameStatus = 'You Surrendered'">SURRENDER</button>
+      </section>
+      <!-- Battle Log -->
+      <section id="log" class="container">
+        <h2>Battle Log</h2>
+        <p> <b> Round: {{ currentRound }} </b> </p>
+        <ul>
+          <li v-for="(log, idx) in battleLog">
+            <p v-for="(value, name) in log['value']">
+              <span :class="{ 'log--villain': name === 'Villain', 'log--player': name !== 'Villain' }">
+                {{ name }}
+              </span>
+              {{ log['text'] }}
+              <span :class="{'log--damage' : log['action'] === 'attack', 'log--heal': log['action'] === 'heal'}"> {{
+                value
+                }} </span>
+            </p>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+  <!-- Vanta Halo BG => https://www.vantajs.com/?effect=halo#(amplitudeFactor:3,backgroundAlpha:1,backgroundColor:7606733,baseColor:13762815,color2:15918901,gyroControls:!f,minHeight:200,minWidth:200,mouseControls:!t,mouseEase:!t,ringFactor:1,rotationFactor:1,scale:1,scaleMobile:1,size:0.9,speed:1,touchControls:!t,xOffset:0,yOffset:0.22) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.halo.min.js"></script>
+  <script type="text/javascript">
+    VANTA.HALO({
+      el: "#vanta-canvas",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      baseColor: 0xd200ff,
+      backgroundColor: 0x7411cd,
+      amplitudeFactor: 3.00,
+      yOffset: 0.1,
+      size: 1
+    })
+  </script>
+</body>
+
+</html>
