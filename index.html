@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vue Villainious Battles</title>
+  <title>Vue Villainous Battles</title>
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦹‍♂️</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;700&display=swap" rel="stylesheet" />
@@ -22,7 +22,7 @@
   <!-- Game -->
   <div id="game">
     <header :class="{'starting-screen-header': gameStatus === 'Not Started'}">
-      <h1>Vue Villainious Battles</h1>
+      <h1>Vue Villainous Battles</h1>
       <button @click="goHome" v-show="gameStatus !== 'Not Started'" id="home-button">BACK TO START SCREEN</button>
     </header>
     <div id="starting-screen" v-if="gameStatus === 'Not Started'">
